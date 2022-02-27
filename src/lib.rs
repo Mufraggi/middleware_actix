@@ -45,13 +45,11 @@ impl FromRequest for AuthorizationMiddleware {
 
 #[cfg(test)]
 mod tests {
-    use crate::{AuthorizationMiddleware};
-    use actix_web::body::{Body, ResponseBody};
-    use actix_web::error::ErrorUnauthorized;
+    use chrono::{ Duration, Utc};
+    use crate::{AuthorizationMiddleware, Claims, Config, IConfig};
     use actix_web::http::StatusCode;
     use actix_web::{test, Error, FromRequest, HttpRequest};
-    use futures::future::err;
-    use serde_json::json;
+    use jsonwebtoken::{encode, EncodingKey, Header};
 
     #[actix_rt::test]
     async fn from_request_fail_return_invalid() {
@@ -73,22 +71,35 @@ mod tests {
             AuthorizationMiddleware::from_request(&req, &mut res.1).await;
         let tmp = resp.err().unwrap();
         let res_to_check = tmp.as_response_error();
-        let test: &ResponseBody<Body> = res_to_check.error_response().body();
         assert_eq!(res_to_check.status_code(), StatusCode::UNAUTHORIZED);
     }
     #[actix_rt::test]
     async fn form_request_work() {
-        let user_id = "muf";
+        let user_id = "muf".to_string() ;
         let admin = false;
-        let token ="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwidXNlcl9pZCI6Im11ZiIsImFkbWluIjpmYWxzZSwiZXhwIjoyMDQyNDU1OTY1fQ.CQlITjRrgcJoKvrHRf-R5Up4oTwGKGvxdmKqtR-Ucdw";
+        let date = Utc::now() + Duration::hours(1);
+        let my_claims = Claims {
+            user_id,
+            admin,
+            exp: date.timestamp() as u32,
+        };
+        let config: Config = Config {};
+        let token = encode(
+            &Header::default(),
+            &my_claims,
+            &EncodingKey::from_secret(config.get_config_with_key("SECRET_KEY").as_ref()),
+        )
+            .unwrap();
         let req: HttpRequest = test::TestRequest::default()
-            .header("Authorization", "Bearer ".to_owned() + token)
+            .header("Authorization", "Bearer ".to_owned() + &token)
             .to_http_request();
         let mut res = test::TestRequest::to_http_parts(Default::default());
         let resp: Result<AuthorizationMiddleware, Error> =
             AuthorizationMiddleware::from_request(&req, &mut res.1).await;
         let tmp = resp.unwrap();
-        assert_eq!(tmp.user_id, user_id);
-        assert_eq!(tmp.admin, admin);
+        assert_eq!(tmp.eq(&AuthorizationMiddleware{
+             user_id: "muf".to_string(),
+            admin:false
+        }), true)
     }
 }
