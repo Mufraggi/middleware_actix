@@ -8,14 +8,8 @@ pub struct Claims {
     pub exp: u32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct AuthorizationMiddleware {
     pub user_id: String,
     pub admin:bool
-}
-
-impl PartialEq for AuthorizationMiddleware {
-    fn eq(&self, other: &Self) -> bool {
-        self.admin == other.admin && self.user_id == other.user_id
-    }
 }
