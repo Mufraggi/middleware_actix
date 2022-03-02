@@ -1,6 +1,7 @@
 [package]
 name = "midlware"
 license = "MIT"
+description = "A short description of my package"
 version = "0.1.0"
 edition = "2018"
 
