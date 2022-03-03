@@ -2,7 +2,7 @@
 name = "midlware"
 license = "MIT"
 description = "A short description of my package"
-version = "0.1.001"
+version = "0.1.1"
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
