@@ -8,7 +8,7 @@ pub struct Claims {
     pub exp: u32,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct AuthorizationMiddleware {
     pub user_id: String,
     pub admin:bool
