@@ -1,8 +1,8 @@
 mod config;
 mod models;
 
-use crate::config::{Config, IConfig};
-use crate::models::user::{AuthorizationMiddleware, Claims};
+pub use crate::config::{Config, IConfig};
+pub use crate::models::user::{AuthorizationMiddleware, Claims};
 use actix_web::dev::Payload;
 use actix_web::error::ErrorUnauthorized;
 use actix_web::{Error, FromRequest, HttpRequest};
@@ -16,7 +16,7 @@ impl FromRequest for AuthorizationMiddleware {
     type Future = Ready<Result<AuthorizationMiddleware, Error>>;
     type Config = ();
 
-    fn from_request(req: &HttpRequest, _payload: &mut Payload) -> Self::Future {
+     fn from_request(req: &HttpRequest, _payload: &mut Payload) -> Self::Future {
         let auth = req.headers().get("Authorization");
         match auth {
             Some(_) => {
