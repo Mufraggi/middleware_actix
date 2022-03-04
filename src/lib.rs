@@ -22,8 +22,8 @@ impl FromRequest for AuthorizationMiddleware {
             Some(_) => {
                 let split: Vec<&str> = auth.unwrap().to_str().unwrap().split("Bearer").collect();
                 let token = split[1].trim();
-                let config: Config = Config {};
-                let var = config.get_config_with_key("SECRET_KEY");
+                let config: Config = Config {path: "src/config/config.env".to_string() };
+                let var = "Xqv8jTGLxT";
                 let key = var.as_bytes();
                 match decode::<Claims>(
                     &token.to_string(),
@@ -83,7 +83,7 @@ mod tests {
             admin,
             exp: date.timestamp() as u32,
         };
-        let config: Config = Config {};
+        let config: Config = Config {path: "src/config/config.env".to_string() };
         let token = encode(
             &Header::default(),
             &my_claims,
